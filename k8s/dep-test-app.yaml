@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-test-app
+  labels:
+    app: dep-test-app-label
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dep-test
+  template:
+    metadata:
+      labels:
+        app: dep-test
+    spec:
+      containers:
+        - name: dep-test-app
+          image: ismataga/k8s-ingress:0.0.1-SNAPSHOT
+          ports:
+            - containerPort: 8011
+          env:
+            - name: DATABASE_IP
+              value: svc-postgres
+            - name: DATABASE_PASSWORD
+              value: "postgres"
