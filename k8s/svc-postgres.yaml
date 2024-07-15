@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    api: svc-postgres-test
+  name: svc-postgres
+  namespace: default
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      nodePort: 30007
+  type: NodePort
+  selector:
+    app: dep-postgres-label

@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'com.bmuschko.docker-remote-api' version '9.0.0'
+}
+
+group = 'az.finlab'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+//    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// Define dockerRepoUrl in gradle.properties or as an environment variable
+def dockerRepoUrl = project.findProperty('dockerRepoUrl') ?: System.getenv('DOCKER_REPO_URL')
+
+task createDockerfile(type: com.bmuschko.gradle.docker.tasks.image.Dockerfile) {
+    destFile.set(project.file('Dockerfile'))
+    from 'openjdk:17'
+    copyFile "build/libs/${project.name}-${project.version}.jar", '/app/'
+    entryPoint 'java'
+    defaultCommand '-jar', "/app/${project.name}-${project.version}.jar"
+}
+
+task buildDockerImage(type: Exec, dependsOn: [assemble, createDockerfile]) {
+    commandLine 'docker', 'build', '.', '-t', "${dockerRepoUrl}/${project.name}:${version}"
+    doLast {
+        println "Built Docker image: ${dockerRepoUrl}/${project.name}:${version}"
+    }
+}
+
+task pushDockerImage(type: Exec, dependsOn: buildDockerImage) {
+    commandLine 'docker', 'push', "${dockerRepoUrl}/${project.name}:${version}"
+    doLast {
+        println "Pushed Docker image: ${dockerRepoUrl}/${project.name}:${version}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register('run', Exec) {
+    group = 'Application'
+    description = 'Run the Spring Boot application'
+    commandLine 'java', '-jar', "build/libs/${project.name}-${project.version}.jar"
+}
