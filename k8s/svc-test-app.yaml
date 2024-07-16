@@ -1,15 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: svc-test-app
   labels:
     app: svc-test-app-labels
-  name: svc-test-app
   namespace: default
 spec:
-  ports:
-    - port: 80
-      protocol: TCP
-      nodePort: 30007
   type: NodePort
   selector:
-    app: dep-test-app-label
+    app: dep-test-app-selector
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30008
+

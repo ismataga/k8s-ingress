@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dep-postgres
+      app: dep-postgres-selector
   template:
     metadata:
       labels:
-        app: dep-postgres
+        app: dep-postgres-selector
     spec:
       containers:
         - name: con-postgres
@@ -22,3 +22,5 @@ spec:
           env:
             - name: POSTGRES_PASSWORD
               value: "password"
+            - name: POSTGRES_DB
+              value: postgres

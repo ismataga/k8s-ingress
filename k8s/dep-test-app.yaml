@@ -8,14 +8,14 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: dep-test
+      app: dep-test-app-selector
   template:
     metadata:
       labels:
-        app: dep-test
+        app: dep-test-app-selector
     spec:
       containers:
-        - name: dep-test-app
+        - name: con-test-app
           image: ismataga/k8s-ingress:0.0.1-SNAPSHOT
           ports:
             - containerPort: 8011
