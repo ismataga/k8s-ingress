@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dep-test-app
+  name: ms1
   labels:
-    app: dep-test-app-label
+    app: ms-label
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: dep-test-app-selector
+      app: ms1-selector
   template:
     metadata:
       labels:
-        app: dep-test-app-selector
+        app: ms1-selector
     spec:
       containers:
-        - name: con-test-app
+        - name: con-ms1
           image: ismataga/k8s-ingress:0.0.1-SNAPSHOT
           ports:
             - containerPort: 8011
